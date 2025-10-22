@@ -77,7 +77,7 @@ const Index = () => {
     <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center p-4 gap-8">
       <div className="text-center space-y-3">
         <div className="animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-400 via-red-400 to-orange-400 bg-clip-text text-transparent mb-3">
+          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-pink-400 via-red-400 to-orange-400 bg-clip-text text-transparent mb-3">
             Nuestra Ruleta del Amor
           </h1>
           <div className="relative group">
