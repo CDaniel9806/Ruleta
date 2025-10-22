@@ -12,15 +12,15 @@ const colores = [
   { color: "hsl(330, 100%, 71%)", nombre: "Baile juntos" },
   { color: "hsl(270, 100%, 60%)", nombre: "Masajes relajantes" },
   { color: "hsl(0, 100%, 50%)", nombre: "Juegos de mesa" },
-  { color: "hsl(25, 100%, 50%)", nombre: "Sorpresa romántica" },
+  { color: "hsl(25, 100%, 50%)", nombre: "Ir aguas termales" },
 ];
 
 export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
   const segmentAngle = 360 / colores.length;
 
   return (
-    <div className="relative flex items-center justify-center">
-      <div className="relative">
+    <div className="relative flex items-center justify-center bg-transparent">
+      <div className="relative bg-transparent">
         {/* Puntero personalizado con animación */}
         <div className={`absolute -top-6 left-1/2 -translate-x-1/2 z-20 ${isSpinning ? 'ruleta-girando' : ''}`}>
           <div className="ruleta-puntero"></div>
@@ -31,13 +31,12 @@ export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
           className="relative transition-transform"
           style={{
             transform: `rotate(${rotation}deg)`,
-            filter: "drop-shadow(0 20px 60px rgba(251, 146, 60, 0.4))",
             transition: `transform ${(20000 + (Math.floor(Math.random() * 10) + 15) * 150)}ms cubic-bezier(0.1, 0.7, 0.1, 1.0)`
           }}
         >
           {/* Borde exterior con remaches */}
           <div className="relative">
-            <svg width="400" height="400" viewBox="0 0 400 400" className="relative">
+            <svg width="400" height="400" viewBox="0 0 400 400" className="relative" style={{backgroundColor: 'transparent'}}>
               {/* Borde naranja grueso */}
               <circle
                 cx="200"
@@ -87,7 +86,7 @@ export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
                 // Ajustar la rotación para que el texto apunte hacia afuera
                 let rotation = (midAngle * 180 / Math.PI) + (midAngle > Math.PI ? 270 : 90);
                 // Ajustes especiales para mejor legibilidad
-                if (colorData.nombre === "Juegos de mesa" || colorData.nombre === "Sorpresa romántica") {
+                if (colorData.nombre === "Juegos de mesa" || colorData.nombre === "Ir aguas termales") {
                   rotation += 180; // Girar 180 grados para mejor legibilidad
                 }
                 

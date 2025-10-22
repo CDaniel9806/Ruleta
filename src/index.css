@@ -2,6 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    /* Configuración de tema oscuro */
+    --background: 15 23 42; /* Azul oscuro */
+    --foreground: 248 250 252; /* Casi blanco */
+    
+    --card: 15 23 42;
+    --card-foreground: 248 250 252;
+    
+    --popover: 15 23 42;
+    --popover-foreground: 248 250 252;
+    
+    --primary: 25 100% 50%; /* Naranja */
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 330 100% 60%; /* Rosa */
+    --secondary-foreground: 0 0% 100%;
+    
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    
+    --accent: 330 100% 71%;
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 330 100% 60%;
+    
+    --radius: 1rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    min-height: 100vh;
+    background-color: #0f172a; /* Fondo oscuro forzado */
+  }
+}
+
 @keyframes bounce {
   0%, 100% {
     transform: translateY(0) scale(1);

@@ -74,14 +74,25 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 gap-12">
-      <div className="text-center space-y-4">
-        <h1 className="text-5xl md:text-6xl font-bold text-foreground">
-          Ruleta de la Suerte
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          ¡Gira y descubre tu color ganador!
-        </p>
+    <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center p-4 gap-12">
+      <div className="text-center space-y-6">
+        <div className="animate-fade-in">
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-pink-400 via-red-400 to-orange-400 bg-clip-text text-transparent mb-6">
+            Nuestra Ruleta del Amor
+          </h1>
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-orange-500 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
+            <div className="relative px-8 py-4 bg-gradient-to-r from-pink-900/30 to-orange-900/30 backdrop-blur-sm rounded-lg border border-pink-500/30">
+              <p className="text-xl md:text-2xl font-medium text-pink-100 text-center">
+                <span className="text-pink-200">✨</span> Cada giro es una nueva aventura juntos mi amor <span className="text-pink-200">✨</span>
+              </p>
+              <p className="text-pink-100/90 text-center mt-2 text-lg">
+                Gira la ruleta y deja que el destino elija nuestra próxima cita especial
+              </p>
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-1 bg-gradient-to-r from-transparent via-pink-400/50 to-transparent"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <Ruleta isSpinning={isSpinning} rotation={rotation} />
