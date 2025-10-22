@@ -6,13 +6,13 @@ interface RuletaProps {
 }
 
 const colores = [
-  { color: "hsl(48, 100%, 50%)", nombre: "Amarillo" },
-  { color: "hsl(142, 71%, 45%)", nombre: "Verde" },
-  { color: "hsl(210, 100%, 50%)", nombre: "Azul" },
-  { color: "hsl(330, 100%, 71%)", nombre: "Rosa" },
-  { color: "hsl(270, 100%, 60%)", nombre: "Morado" },
-  { color: "hsl(0, 100%, 50%)", nombre: "Rojo" },
-  { color: "hsl(25, 100%, 50%)", nombre: "Naranja" },
+  { color: "hsl(48, 100%, 50%)", nombre: "Cena romántica" },
+  { color: "hsl(142, 71%, 45%)", nombre: "Noche de películas" },
+  { color: "hsl(210, 100%, 50%)", nombre: "Paseo al atardecer" },
+  { color: "hsl(330, 100%, 71%)", nombre: "Baile juntos" },
+  { color: "hsl(270, 100%, 60%)", nombre: "Masajes relajantes" },
+  { color: "hsl(0, 100%, 50%)", nombre: "Juegos de mesa" },
+  { color: "hsl(25, 100%, 50%)", nombre: "Sorpresa romántica" },
 ];
 
 export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
@@ -30,10 +30,11 @@ export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
 
       {/* Contenedor de la ruleta con sombra */}
       <div 
-        className="relative transition-transform duration-[4000ms] ease-[cubic-bezier(0.17,0.67,0.12,0.99)]"
+        className="relative transition-transform"
         style={{ 
           transform: `rotate(${rotation}deg)`,
-          filter: "drop-shadow(0 20px 60px rgba(251, 146, 60, 0.4))"
+          filter: "drop-shadow(0 20px 60px rgba(251, 146, 60, 0.4))",
+          transition: `transform ${(20000 + (Math.floor(Math.random() * 10) + 15) * 150)}ms cubic-bezier(0.1, 0.7, 0.1, 1.0)`
         }}
       >
         {/* Borde exterior con remaches */}
@@ -61,6 +62,18 @@ export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
 
               const largeArcFlag = segmentAngle > 180 ? 1 : 0;
 
+              // Calcular posición y orientación del texto
+              const midAngle = (startAngle + endAngle) / 2;
+              const textRadius = 130; // Punto intermedio entre el centro y el borde
+              const textX = 200 + textRadius * Math.cos(midAngle);
+              const textY = 200 + textRadius * Math.sin(midAngle);
+              // Ajustar la rotación para que el texto apunte hacia afuera
+              let rotation = (midAngle * 180 / Math.PI) + (midAngle > Math.PI ? 270 : 90);
+              // Ajustes especiales para mejor legibilidad
+              if (colorData.nombre === "Juegos de mesa" || colorData.nombre === "Sorpresa romántica") {
+                rotation += 180; // Girar 180 grados para mejor legibilidad
+              }
+              
               return (
                 <g key={index}>
                   <path
@@ -69,6 +82,37 @@ export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
                     stroke="white"
                     strokeWidth="3"
                   />
+                  <g transform={`rotate(${rotation}, ${textX}, ${textY})`}>
+                    <text
+                      x={textX}
+                      y={textY}
+                      textAnchor="middle"
+                      fill="white"
+                      fontSize="12"
+                      fontWeight="bold"
+                      style={{
+                        textShadow: '1px 1px 2px rgba(0,0,0,0.7)',
+                        pointerEvents: 'none',
+                        userSelect: 'none',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}
+                    >
+                      {colorData.nombre.split(' ').map((word, i, arr) => (
+                        <tspan 
+                          key={i} 
+                          x={textX} 
+                          dy={i === 0 ? '0' : '1.2em'}
+                          textAnchor="middle"
+                          style={{
+                            display: 'block'
+                          }}
+                        >
+                          {word}
+                        </tspan>
+                      ))}
+                    </text>
+                  </g>
                 </g>
               );
             })}
