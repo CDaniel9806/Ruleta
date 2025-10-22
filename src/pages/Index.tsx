@@ -83,7 +83,7 @@ const Index = () => {
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-orange-500 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
             <div className="relative px-4 py-2 bg-gradient-to-r from-pink-900/30 to-orange-900/30 backdrop-blur-sm rounded-lg border border-pink-500/30">
-              <p className="text-sm md:text-base font-medium text-pink-100 text-center leading-tight">
+              <p className="text-xs md:text-sm font-medium text-pink-100 text-center leading-tight">
                 <span className="text-pink-200">✨</span> Cada giro es una nueva aventura juntos mi amor <span className="text-pink-200">✨</span>
               </p>
               <p className="text-pink-100/80 text-center text-xs md:text-sm">
