@@ -104,14 +104,14 @@ export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
                         y={textY}
                         textAnchor="middle"
                         fill="white"
-                        fontSize="12"
+                        fontSize="14"
                         fontWeight="bold"
                         style={{
                           textShadow: '1px 1px 2px rgba(0,0,0,0.7)',
                           pointerEvents: 'none',
                           userSelect: 'none',
                           textTransform: 'uppercase',
-                          letterSpacing: '0.5px'
+                          letterSpacing: '0.8px'
                         }}
                       >
                         {colorData.nombre.split(' ').map((word, i, arr) => (
@@ -121,7 +121,7 @@ export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
                             dy={i > 0 ? '1.2em' : 0}
                             style={{
                               fill: 'white',
-                              fontSize: i === 0 ? '12px' : '10px',
+                              fontSize: i === 0 ? '14px' : '12px',
                               fontWeight: i === 0 ? 'bold' : 'normal',
                               textShadow: '1px 1px 2px rgba(0,0,0,0.7)',
                               letterSpacing: '0.5px'
