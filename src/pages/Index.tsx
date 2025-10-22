@@ -1,103 +1,136 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Ruleta } from "@/components/Ruleta";
 import { BotonGirar } from "@/components/BotonGirar";
-const colores = [
-  { color: "hsl(48, 100%, 50%)", nombre: "Amarillo" },
-  { color: "hsl(142, 71%, 45%)", nombre: "Verde" },
-  { color: "hsl(210, 100%, 50%)", nombre: "Azul" },
-  { color: "hsl(330, 100%, 71%)", nombre: "Rosa" },
-  { color: "hsl(270, 100%, 60%)", nombre: "Morado" },
-  { color: "hsl(0, 100%, 50%)", nombre: "Rojo" },
-  { color: "hsl(25, 100%, 50%)", nombre: "Naranja" },
-];
+import { ShareModal } from "@/components/ShareModal";
+import { COLORES } from "@/constants/colors";
 
 const Index = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  // Clean up timeout on component unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [timeoutId]);
+
+  // Función para calcular la opción seleccionada basada en la rotación
+  const calcularOpcionSeleccionada = (rotacion: number): string => {
+    // Ajustar la rotación para que 0 grados esté en la parte superior
+    const rotacionAjustada = (360 - (rotacion % 360) + 90) % 360;
+    const segmentAngle = 360 / COLORES.length;
+    const selectedIndex = Math.floor(rotacionAjustada / segmentAngle) % COLORES.length;
+    return COLORES[selectedIndex].nombre;
+  };
 
   const girarRuleta = () => {
     if (isSpinning) return;
 
     setIsSpinning(true);
+    setSelectedOption(null);
     
-    // Generar un número aleatorio criptográficamente seguro si está disponible
-    const randomBuffer = new Uint32Array(1);
-    let randomValue: number;
-    if (window.crypto && window.crypto.getRandomValues) {
-      window.crypto.getRandomValues(randomBuffer);
-      randomValue = randomBuffer[0] / (0xffffffff + 1);
-    } else {
-      randomValue = Math.random();
-    }
+    // Generar un valor aleatorio para la selección
+    const randomValue = Math.random();
     
-    // Número de vueltas más aleatorio (entre 12 y 30)
-    const vueltasMinimas = 12;
-    const vueltasMaximas = 30;
+    // Número de vueltas (entre 5 y 15)
+    const vueltasMinimas = 5;
+    const vueltasMaximas = 15;
     const vueltasAleatorias = Math.floor(randomValue * (vueltasMaximas - vueltasMinimas + 1)) + vueltasMinimas;
     
-    const segmentAngle = 360 / colores.length;
+    // Ángulo por segmento
+    const segmentAngle = 360 / COLORES.length;
     
-    // Selección de segmento con distribución más aleatoria
-    const tiempo = new Date().getTime();
-    const seed = (randomValue * tiempo) % 1;
-    const segmentoBase = Math.floor(seed * colores.length);
+    // Selección de segmento aleatorio (índice de la opción que debe ganar)
+    const indiceGanador = Math.floor(randomValue * COLORES.length);
     
-    // Aplicar un pequeño desplazamiento aleatorio adicional
-    const desplazamiento = (Math.sin(tiempo * 0.001) * 0.5 + 0.5) * segmentAngle * 0.8;
+    // Calcular la rotación necesaria para que el puntero apunte al segmento ganador
+    // Ajustamos para que el puntero apunte al centro del segmento
+    const rotacionDestino = 360 - (indiceGanador * segmentAngle + segmentAngle / 2);
     
-    // Calcular rotación total con múltiples factores de aleatoriedad
-    const rotacionBase = vueltasAleatorias * 360;
-    const rotacionSegmento = segmentoBase * segmentAngle;
+    // Añadir vueltas completas para que la ruleta gire varias veces antes de detenerse
+    const rotacionTotal = vueltasAleatorias * 360 + rotacionDestino;
     
-    // Usar múltiples funciones trigonométricas con diferentes frecuencias para mayor aleatoriedad
-    const ruido1 = Math.sin(tiempo * 0.002) * 0.5 + 0.5; // Valor entre 0 y 1
-    const ruido2 = Math.cos(tiempo * 0.003) * 0.5 + 0.5; // Valor entre 0 y 1
-    const rotacionExtra = (randomValue * segmentAngle * 0.9) + (ruido1 * segmentAngle * 0.4);
+    // Duración del giro (entre 3 y 8 segundos)
+    const duracionBase = 3000 + (randomValue * 5000);
+    const duracionExtra = vueltasAleatorias * 50;
+    const duracionGiro = Math.min(duracionBase + duracionExtra, 8000);
     
-    // Añadir ruido aleatorio adicional basado en el tiempo y la posición del ratón
-    const ruido = (ruido2 * segmentAngle * 0.3);
-    
-    const totalRotation = rotacionBase + rotacionSegmento + rotacionExtra + ruido + desplazamiento;
-    
-    // Iniciar la animación con la nueva rotación
-    setRotation(prev => prev + totalRotation);
-    
-    // Hacer la duración más variable (entre 18 y 28 segundos)
-    const duracionBase = 18000 + (randomValue * 10000);
-    const duracionExtra = vueltasAleatorias * 120; // 120ms extra por vuelta
-    const duracionGiro = Math.min(duracionBase + duracionExtra, 30000); // Máximo 30 segundos
-    
-    // Deshabilitar el botón temporalmente
+    // Añadir un pequeño retraso para asegurar que la animación se inicie
     setTimeout(() => {
-      setIsSpinning(false);
-    }, duracionGiro);
+      // Iniciar la animación
+      setRotation(prev => prev + rotacionTotal);
+      
+      // Configurar un listener para cuando termine la transición
+      const ruletaElement = document.querySelector('.ruleta-container');
+      
+      const handleTransitionEnd = () => {
+        // Usar el índice del ganador que ya calculamos
+        const opcionGanadora = COLORES[indiceGanador].nombre;
+        
+        setSelectedOption(opcionGanadora);
+        setIsSpinning(false);
+        
+        // Mostrar el modal después de un pequeño retraso
+        setTimeout(() => {
+          setShowShareModal(true);
+        }, 300);
+        
+        // Limpiar el event listener
+        ruletaElement?.removeEventListener('transitionend', handleTransitionEnd);
+      };
+      
+      // Añadir el event listener para cuando termine la transición
+      ruletaElement?.addEventListener('transitionend', handleTransitionEnd, { once: true });
+      
+      // Limpiar el event listener si el componente se desmonta
+      return () => {
+        ruletaElement?.removeEventListener('transitionend', handleTransitionEnd);
+      };
+      
+    }, 50); // Pequeño retraso para asegurar que la animación se inicie correctamente
   };
 
   return (
     <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center p-4 gap-8">
       <div className="text-center space-y-3">
-        <div className="animate-fade-in">
-          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-pink-400 via-red-400 to-orange-400 bg-clip-text text-transparent mb-3">
-            Nuestra Ruleta del Amor
-          </h1>
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-orange-500 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
-            <div className="relative px-4 py-2 bg-gradient-to-r from-pink-900/30 to-orange-900/30 backdrop-blur-sm rounded-lg border border-pink-500/30">
-              <p className="text-xs md:text-sm font-medium text-pink-100 text-center leading-tight">
-                <span className="text-pink-200">✨</span> Cada giro es una nueva aventura juntos mi amor <span className="text-pink-200">✨</span>
-              </p>
-              <p className="text-pink-100/80 text-center text-xs md:text-sm">
-                Gira la ruleta y deja que el destino elija nuestra próxima cita especial
-              </p>
-              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3/4 h-0.5 bg-gradient-to-r from-transparent via-pink-400/50 to-transparent"></div>
-            </div>
+        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-pink-400 via-red-400 to-orange-400 bg-clip-text text-transparent mb-3">
+          Nuestra Ruleta del Amor
+        </h1>
+        <div className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-orange-500 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
+          <div className="relative px-4 py-2 bg-gradient-to-r from-pink-900/30 to-orange-900/30 backdrop-blur-sm rounded-lg border border-pink-500/30">
+            <p className="text-xs md:text-sm font-medium text-pink-100 text-center leading-tight">
+              <span className="text-pink-200">✨</span> Cada giro es una nueva aventura juntos mi amor <span className="text-pink-200">✨</span>
+            </p>
+            <p className="text-pink-100/80 text-center text-xs md:text-sm">
+              Gira la ruleta y descubre qué nos depara el destino hoy
+            </p>
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3/4 h-0.5 bg-gradient-to-r from-transparent via-pink-400/50 to-transparent"></div>
           </div>
         </div>
       </div>
 
-      <Ruleta isSpinning={isSpinning} rotation={rotation} />
+      <Ruleta 
+        isSpinning={isSpinning} 
+        rotation={rotation} 
+        segmentAngle={360 / COLORES.length}
+        selectedOption={!isSpinning ? selectedOption : null}
+      />
 
       <BotonGirar onClick={girarRuleta} disabled={isSpinning} />
+      
+      {showShareModal && selectedOption && (
+        <ShareModal 
+          selectedOption={selectedOption}
+          onClose={() => setShowShareModal(false)}
+        />
+      )}
     </div>
   );
 };

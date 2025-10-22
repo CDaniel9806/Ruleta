@@ -1,26 +1,19 @@
 import { useState, useRef } from "react";
+import { COLORES } from "@/constants/colors";
 
 interface RuletaProps {
   isSpinning: boolean;
   rotation: number;
+  segmentAngle: number;
+  selectedOption?: string | null;
 }
 
-const colores = [
-  { color: "hsl(48, 100%, 50%)", nombre: "Cena romántica" },
-  { color: "hsl(142, 71%, 45%)", nombre: "Noche de películas" },
-  { color: "hsl(210, 100%, 50%)", nombre: "Paseo al atardecer" },
-  { color: "hsl(330, 100%, 71%)", nombre: "Baile juntos" },
-  { color: "hsl(270, 100%, 60%)", nombre: "Masajes relajantes" },
-  { color: "hsl(0, 100%, 50%)", nombre: "Juegos de mesa" },
-  { color: "hsl(25, 100%, 50%)", nombre: "Ir aguas termales" },
-];
-
-export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
-  const segmentAngle = 360 / colores.length;
+export const Ruleta = ({ isSpinning, rotation, segmentAngle, selectedOption }: RuletaProps) => {
+  // Use the shared COLORES constant
 
   return (
     <div className="relative flex items-center justify-center bg-transparent">
-      <div className="relative bg-transparent">
+      <div className="relative bg-transparent ruleta-container">
         {/* Puntero personalizado con animación */}
         <div className={`absolute -top-6 left-1/2 -translate-x-1/2 z-20 ${isSpinning ? 'ruleta-girando' : ''}`}>
           <div className="ruleta-puntero"></div>
@@ -31,7 +24,11 @@ export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
           className="relative transition-transform"
           style={{
             transform: `rotate(${rotation}deg)`,
-            transition: `transform ${(20000 + (Math.floor(Math.random() * 10) + 15) * 150)}ms cubic-bezier(0.1, 0.7, 0.1, 1.0)`
+            transition: isSpinning 
+              ? `transform ${(20000 + (Math.floor(Math.random() * 10) + 15) * 150)}ms cubic-bezier(0.1, 0.7, 0.1, 1.0)`
+              : 'none',
+            transformOrigin: 'center',
+            willChange: 'transform'
           }}
         >
           {/* Borde exterior con remaches */}
@@ -67,7 +64,7 @@ export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
               })}
               
               {/* Segmentos de colores */}
-              {colores.map((colorData, index) => {
+              {COLORES.map((colorData, index) => {
                 const startAngle = (index * segmentAngle - 90) * (Math.PI / 180);
                 const endAngle = ((index + 1) * segmentAngle - 90) * (Math.PI / 180);
                 
@@ -136,13 +133,26 @@ export const Ruleta = ({ isSpinning, rotation }: RuletaProps) => {
                 );
               })}
 
-              {/* Círculo central */}
+              {/* Círculo central con opción seleccionada */}
               <circle
                 cx="200"
                 cy="200"
-                r="25"
+                r="60"
                 fill="url(#centerGradient)"
+                className="transition-all duration-300"
               />
+              {selectedOption && !isSpinning && (
+                <text
+                  x="200"
+                  y="200"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className="text-xs font-bold text-white text-center"
+                  style={{ pointerEvents: 'none', userSelect: 'none' }}
+                >
+                  {selectedOption}
+                </text>
+              )}
 
               <defs>
                 <radialGradient id="centerGradient">
